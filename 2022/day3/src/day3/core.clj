@@ -9,7 +9,7 @@
         (split-at (/ (count backpack) 2) backpack)]
     (->> compartment-2
          (mapcat #(map (fn [y] (when (= y %) %)) compartment-1))
-         (drop-while nil?)
+         (remove nil?)
          first)))
 
 (defn item-priority [item]
@@ -23,6 +23,31 @@
        (map item-priority)
        (reduce +)))
 
+(defn find-common-item [backpacks]
+  (let [[a b c] backpacks]
+    (->>
+     (mapcat
+      (fn [x]
+        (mapcat
+         (fn [y]
+           (map
+            (fn [z] (when (= x y z) z))
+            c))
+         b))
+      a)
+     (remove nil?)
+     (first))))
+
+
+
+(defn part-2 [backpacks]
+  (->> backpacks
+       (partition 3)
+       (map find-common-item)
+       (map item-priority)
+       (reduce +)))
+
 (defn -main
   [& args]
-  (println "part-1 priority: " (part-1 input)))
+  (println "part-1 priority: " (part-1 input))
+  (println "part-2 priority: " (part-2 input)))
