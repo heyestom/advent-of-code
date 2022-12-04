@@ -2,16 +2,25 @@
   (:gen-class)
   (:require [clojure.string :as str]))
 
-(def input (->> "input.txt"
-                slurp
-                str/split-lines
-                (map #(map (fn [x] (Integer/parseInt x)) (str/split (str/replace % #"[-|,]" " ") #" ")))))
+(defn parse-coordinates [coords]
+  (map #(Integer/parseInt %) coords))
+
+(def input
+  (->> "input.txt"
+       slurp
+       str/split-lines
+       (map #(->> (str/split % #"[-|,]")
+                  (parse-coordinates)))))
 
 (defn assignments-fully-contained?
   [[elf-a-start elf-a-end elf-b-start elf-b-end]]
   (or
-   (and (<= elf-a-start elf-b-start) (>= elf-a-end elf-b-end))
-   (and (<= elf-b-start elf-a-start) (>= elf-b-end elf-a-end) )))
+   (and
+    (<= elf-a-start elf-b-start)
+    (>= elf-a-end elf-b-end))
+   (and
+    (<= elf-b-start elf-a-start)
+    (>= elf-b-end elf-a-end))))
 
 (defn part-1 [assignments]
   (->> assignments
@@ -26,8 +35,8 @@
   starting coordinate?"
   [[elf-a-start elf-a-end elf-b-start elf-b-end]]
   (if (< elf-a-start elf-b-start)
-      (>= elf-a-end elf-b-start)
-      (>= elf-b-end elf-a-start)))
+    (>= elf-a-end elf-b-start)
+    (>= elf-b-end elf-a-start)))
 
 (defn part-2 [assignments]
   (->> assignments
