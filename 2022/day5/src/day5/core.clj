@@ -1,5 +1,4 @@
 (ns day5.core
-  (:gen-class)
   (:require [clojure.string :as str]))
 
 (def input  (->> "input.txt"
@@ -37,12 +36,35 @@
 (defn follow-instructions [crates instructions]
   (if (empty? instructions)
     crates
-    (follow-instructions (move-crates crates (first instructions))
-                         (rest instructions))))
+    (recur (move-crates crates (first instructions))
+           (rest instructions))))
 
 (defn part-1 [crates instructions]
   (->>
    (follow-instructions crates instructions)
+   (map first)
+   (apply str)))
+
+(defn move-multiple-crates [crates [number from to]]
+  (let [from-pile (nth crates (dec from))
+        to-pile (nth crates (dec to))
+        [moving-crates remaining-crates] (split-at number from-pile)
+        moved-crates (apply str moving-crates)]
+    (assoc crates
+           (dec from) (apply str remaining-crates)
+           (dec to) (str moved-crates to-pile))))
+
+(defn follow-instructions-multiple-crates [crates instructions]
+  (if (empty? instructions)
+    crates
+    (recur (move-multiple-crates crates (first instructions))
+           (rest instructions))))
+
+(defn part-2 [crates instructions]
+  (->>
+   (follow-instructions-multiple-crates
+    crates
+    instructions)
    (map first)
    (apply str)))
 
@@ -52,5 +74,6 @@
         parsed-crates (parse-crates crates)
         parsed-instructions (parse-instructions instructions)]
 
-    (println "part 1" (part-1 parsed-crates parsed-instructions))))
+    (println "part 1" (part-1 parsed-crates parsed-instructions))
+    (println "part 2" (part-2 parsed-crates parsed-instructions))))
 
